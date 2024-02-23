@@ -9,7 +9,6 @@ Download latest version from this **<a href="https://github.com/kowalej/BlueMuse
 Navigate to the unzipped app folder and run the **.\InstallBlueMuse.ps1** PowerShell command (right click and choose Run with PowerShell or execute from terminal directly)
 
 Follow the prompts: 
-<pre>
 Manual Install
     1. Double click BlueMuse_xxx.cer then click "Install Certificate".
     2. Select current user or local machine depending on preference and click "Next".
@@ -21,7 +20,6 @@ Manual Install
     8. Open Dependencies folder and appropriate folder for your machine architecture.
     9. Double click and install Microsoft.NET.Native.Framework.1.7 and Microsoft.NET.Native.Runtime.1.7.
     10. Finally, double click and install BlueMuse_xxx.appxbundle.
-</pre>
 
 ## SCRIPTS
 If you want to do a script you have to have in the same directory the "muselsl" and import it.
