@@ -21,7 +21,7 @@ Manual Install
     8. Open Dependencies folder and appropriate folder for your machine architecture.
     9. Double click and install Microsoft.NET.Native.Framework.1.7 and Microsoft.NET.Native.Runtime.1.7.
     10. Finally, double click and install BlueMuse_xxx.appxbundle.
-<\pre>
+</pre>
 
 ## SCRIPTS
 If you want to do a script you have to have in the same directory the "muselsl" and import it.
