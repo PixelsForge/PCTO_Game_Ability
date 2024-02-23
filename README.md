@@ -10,7 +10,7 @@ Navigate to the unzipped app folder and run the **.\InstallBlueMuse.ps1** PowerS
 
 Follow the prompts: 
 Manual Install
-    1. Double click BlueMuse_xxx.cer then click "Install Certificate".
+    [^1]. Double click BlueMuse_xxx.cer then click "Install Certificate".
     2. Select current user or local machine depending on preference and click "Next".
     3. Select "Place all certificates in the following store".
     4. Press "Browse...".
