@@ -216,7 +216,7 @@ def compute_beta(eegdata, fs):
 
     feature_vector = np.log10(feature_vector)  # vettore di segnali beta e alpha
 
-    if meanBeta > 0.5:
+    if meanBeta > 0.3:
         print(meanBeta)
         comando = "AVANTI"
     else:

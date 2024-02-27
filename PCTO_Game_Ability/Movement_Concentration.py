@@ -45,6 +45,8 @@ fs_EEG = int(info_EEG.nominal_srate())  # frequency EEG signals
 
 listaComandi = [None]
 
+MIN_SX = 0.5
+MIN_DX = -0.5
 
 def museDxSx():
     """ACQUIRE LATERAL DIRECTION WITH ACCELEROMETER"""
@@ -53,15 +55,15 @@ def museDxSx():
 
     Theta = (0.5 * (gyro_data[-1][2] + gyro_data[-2][2]) * 1 / fs_Gyro)  # speed in this instant, average of the last 2 values, per gyroscope
     # print(Theta)
-    # print(listaComandi)
+    #print(listaComandi)
     comando = None
     if len(listaComandi) == 1:
 
-        if Theta > 0.5:  # go left
+        if Theta > MIN_SX:  # go left
             comando = "A"
             listaComandi.append(comando)
 
-        elif Theta < -0.5:  # go right
+        elif Theta < MIN_DX:  # go right
             comando = "D"
             listaComandi.append(comando)
 
@@ -69,23 +71,15 @@ def museDxSx():
             comando = "W"  # go straight 
             listaComandi.append(comando)
 
-    elif Theta > 0.5 and listaComandi[-2] == "W":
+    elif Theta > MIN_SX and listaComandi[-2] == "W" or Theta > MIN_SX and listaComandi[-2] == "A":
         comando = "A"
 
-    elif Theta < -0.5 and listaComandi[-2] == "A":
+    elif Theta < MIN_DX and listaComandi[-2] == "A" or Theta > MIN_SX and listaComandi[-2] == "D":
         comando = "W"
 
-    elif Theta < -0.5 and listaComandi[-2] == "W":
+    elif Theta < MIN_DX and listaComandi[-2] == "W" or Theta < MIN_SX and listaComandi[-2] == "D":
         comando = "D"
 
-    elif Theta > 0.5 and listaComandi[-2] == "D":
-        comando = "W"
-
-    elif Theta > 0.5 and listaComandi[-2] == "A":
-        comando = "A"
-
-    elif Theta < -0.5 and listaComandi[-2] == "D":
-        comando = "D"
 
     if len(listaComandi) > 1:
         if comando == None:
@@ -93,7 +87,10 @@ def museDxSx():
         else:
             listaComandi.append(comando)
 
-    return comando  # the command that will enter the alphabot
+    if comando != None:
+        return comando  # the command that will enter the alphabot
+    else:
+        return listaComandi[-1]
 
 
 def museConcentrazione():
@@ -115,24 +112,15 @@ def museConcentrazione():
     band_beta = utils.compute_beta(data_epoch, fs_EEG)  
     # compute_beta function for calculating beta rays (concentration)
 
-    """     
-    a second method         
-    print(EEG_data[-1]) #raggi beta
-    Beta = 0.5 * (EEG_data[-1][2] + EEG_data[-2][2]) * 1/fs_EEG #speed in this instant
-    print(Beta)
-    if(Beta > 2):
-        print('concentrato')
-    else:
-        print('non concentrato')
-    """
+
     return band_beta  # command for the alphabot, if concentrated AVANTI then go ahead, otherwise FERMO, stand still
 
 
 def main():
 
     while True:
-        Direzione = museDxSx()
-        Movimento = museConcentrazione()
+        print(museDxSx())
+        print(museConcentrazione())
         print("----------------------------------------------------------------")
 
 

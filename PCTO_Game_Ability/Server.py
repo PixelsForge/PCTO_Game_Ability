@@ -16,7 +16,6 @@ lista_client = []
 
 # classe thread
 
-
 # funzione che si avvia alla creazione della classe
 def __init__(self, connessione, indirizzo, alphabot):
     thr.Thread.__init__(self)  # costruttore super (java)
@@ -24,41 +23,6 @@ def __init__(self, connessione, indirizzo, alphabot):
     self.indirizzo = indirizzo
     self.alphabot = alphabot  # per usare la classe del robot all'interno del thread
     self.running = True
-
-
-# funzione che si avvia con il comando start()
-"""def run(self):
-    while self.running:     #ciclo infinito del programma
-        messaggio = (self.connessione.recv(4096)).decode()          #ricevo il comando
-
-        if messaggio == 'exit':             #per chiudere il programma e scollegare i client
-            self.running = False
-
-            lista_client.remove(self)
-            
-        else:
-            print(messaggio)
-        
-            
-            if messaggio.upper().startswith("W"):
-                self.alphabot.forward()
-                time.sleep(1)        #durata del movimento
-                self.alphabot.stop()
-            if messaggio.upper().startswith("D"):
-                self.alphabot.right()
-                time.sleep(1)   
-                self.alphabot.stop()
-            if messaggio.upper().startswith("S"):
-                self.alphabot.backward()
-                time.sleep(1)   
-                self.alphabot.stop()
-            if messaggio.upper().startswith("A"):
-                self.alphabot.left()
-                time.sleep(1)   
-                self.alphabot.stop()
-            if messaggio.upper().startswith("STOP"):
-                self.alphabot.stop()
-"""
 
 
 class AlphaBot(object):  # classe dell'Alfabot
@@ -107,18 +71,18 @@ class AlphaBot(object):  # classe dell'Alfabot
     def left(self, speed=25):  # girare a sinistra velocità settata in precedenza
         self.PWMA.ChangeDutyCycle(speed)
         self.PWMB.ChangeDutyCycle(speed)
-        GPIO.output(self.IN1, GPIO.LOW)
-        GPIO.output(self.IN2, GPIO.HIGH)
-        GPIO.output(self.IN3, GPIO.LOW)
-        GPIO.output(self.IN4, GPIO.HIGH)
+        GPIO.output(self.IN1, GPIO.HIGH)
+        GPIO.output(self.IN2, GPIO.LOW)
+        GPIO.output(self.IN3, GPIO.HIGH)
+        GPIO.output(self.IN4, GPIO.LOW)  
 
     def right(self, speed=25):  # destra con la velocità settata in precedenza
         self.PWMA.ChangeDutyCycle(speed)
         self.PWMB.ChangeDutyCycle(speed)
-        GPIO.output(self.IN1, GPIO.HIGH)
-        GPIO.output(self.IN2, GPIO.LOW)
-        GPIO.output(self.IN3, GPIO.HIGH)
-        GPIO.output(self.IN4, GPIO.LOW)
+        GPIO.output(self.IN1, GPIO.LOW)
+        GPIO.output(self.IN2, GPIO.HIGH)
+        GPIO.output(self.IN3, GPIO.LOW)
+        GPIO.output(self.IN4, GPIO.HIGH)
 
     def set_pwm_a(self, value):
         self.PA = value
@@ -172,18 +136,18 @@ def main():
 
             if messaggio.upper().startswith("W"):  # avanti
                 Ab.forward()
-                time.sleep(1)  # durata del movimento
-                Ab.stop()
+                #time.sleep(1)
+                #Ab.stop()
 
             if messaggio.upper().startswith("D"):  # destra
                 Ab.right()
-                time.sleep(1)
-                Ab.stop()
+                #time.sleep(1)
+                #Ab.stop()
 
             if messaggio.upper().startswith("A"):  # sinistra
                 Ab.left()
-                time.sleep(1)
-                Ab.stop()
+                #time.sleep(1)
+                #Ab.stop()
 
             if messaggio.upper().startswith("FERMO"):  # fermo
                 Ab.stop()

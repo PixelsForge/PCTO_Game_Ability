@@ -43,26 +43,23 @@ def main():
     ricev = Receiver(s) #receives messages, so that when the server sends the message back to clients, it reaches everyone
     ricev.start()
 
-    comando = "FERMO"
+    comando = None
     while True:
 
         concentrazione = Movement_Concentration.museConcentrazione() #function that calculates the concentration level
-        
-        #print("comando concentrazione: ", concentrazione)
         
         if(concentrazione == "AVANTI"): #concentrated subject
             comando = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
             if (comando != None):
                 print("comando concentrazione: ", comando)
                 s.sendall(comando.encode()) #send the message to the server
-            #time.sleep(5)       
+                #time.sleep(0.5)       
         else:
             comando = concentrazione #alphabot stopped (FERMO) cause unconcentrated subject
             print("comando concentrazione: ", concentrazione)
             s.sendall(comando.encode()) #send the message to the server
-            #time.sleep(5)
+            #time.sleep(0.5)
 
-        
             if 'exit' in comando:   #In case the connection should be interrupted
                 ricev.stop_run()    #breaks the connection
                 logging.info("Disconnessione...")
