@@ -10,6 +10,7 @@ from pylsl import StreamInlet, resolve_byprop
 import utils
 import time
 import numpy as np
+from pynput.keyboard import Key, Controller
 
 BUFFER_LENGTH = 5
 
@@ -115,13 +116,32 @@ def museConcentrazione():
 
     return band_beta  # command for the alphabot, if concentrated AVANTI then go ahead, otherwise FERMO, stand still
 
+def simulationPressionKeys(comando, movimento):
+    keyboard = Controller()
+    if(movimento == "FERMO"):
+        keyboard.press(" ")
+        keyboard.release("w")
+        keyboard.release("a")
+        keyboard.release("d")
+    elif(comando == "W" and movimento == "AVANTI"):
+        keyboard.press("w")
+        keyboard.release(" ")
+        keyboard.release("a")
+        keyboard.release("d")
+    elif(comando == "A"):
+        keyboard.release("w")
+        keyboard.release("d")
+        keyboard.press("a")
+    elif(comando == "D"):
+        keyboard.release("w")
+        keyboard.release("a")
+        keyboard.press("d")
+
 
 def main():
-
+    keyboard = Controller()
     while True:
-        print(museDxSx())
-        print(museConcentrazione())
-        print("----------------------------------------------------------------")
+        simulationPressionKeys(museDxSx(), museConcentrazione())
 
 
 if __name__ == "__main__":
