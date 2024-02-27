@@ -11,7 +11,7 @@ import Movement_Concentration
 
 registered = False
 nickname = ""
-SERVER=('192.168.0.123', 3450) #192.168.0.123 IP address alphabot
+SERVER=('192.168.168.111', 3450) # IP address alphabot
 class Receiver(thr.Thread):
     def __init__(self, s): #Thread constructor, self is like this, s is the socket
         thr.Thread.__init__(self)  #constructor 
@@ -38,36 +38,36 @@ def main():
     global registered
     global nickname
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #I create a TCP / IPv4 socket, first it sends, I create the base that does everything
-    s.connect(SERVER)       #connection to the server
+    s.connect(SERVER)  #connection to the server
 
     ricev = Receiver(s) #receives messages, so that when the server sends the message back to clients, it reaches everyone
     ricev.start()
 
-    comando = 'ESCI'
+    comando = "FERMO"
     while True:
 
         concentrazione = Movement_Concentration.museConcentrazione() #function that calculates the concentration level
         
         #print("comando concentrazione: ", concentrazione)
         
-        if(concentrazione == "Avanti"): #concentrated subject
+        if(concentrazione == "AVANTI"): #concentrated subject
             comando = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
             if (comando != None):
                 print("comando concentrazione: ", comando)
-            s.sendall(comando.encode()) #send the message to the server
+                s.sendall(comando.encode()) #send the message to the server
             #time.sleep(5)       
         else:
-            comando = concentrazione #alphabot stopped (ESCI) cause unconcentrated subject
+            comando = concentrazione #alphabot stopped (FERMO) cause unconcentrated subject
             print("comando concentrazione: ", concentrazione)
             s.sendall(comando.encode()) #send the message to the server
             #time.sleep(5)
 
-            """ 
+        
             if 'exit' in comando:   #In case the connection should be interrupted
                 ricev.stop_run()    #breaks the connection
                 logging.info("Disconnessione...")
                 break
-            """
+            
         
     ricev.join()
     s.close()

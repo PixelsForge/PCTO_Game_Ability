@@ -18,7 +18,7 @@ from sklearn import svm
 from scipy.signal import butter, lfilter, lfilter_zi
 
 
-NOTCH_B, NOTCH_A = butter(4, np.array([55, 65]) / (256 / 2), btype='bandstop')
+NOTCH_B, NOTCH_A = butter(4, np.array([55, 65]) / (256 / 2), btype="bandstop")
 
 
 def epoch(data, samples_epoch, samples_overlap=0):
@@ -43,8 +43,7 @@ def epoch(data, samples_epoch, samples_overlap=0):
 
     samples_shift = samples_epoch - samples_overlap
 
-    n_epochs = int(
-        np.floor((n_samples - samples_epoch) / float(samples_shift)) + 1)
+    n_epochs = int(np.floor((n_samples - samples_epoch) / float(samples_shift)) + 1)
 
     # Markers indicate where the epoch starts, and the epoch contains samples_epoch rows
     markers = np.asarray(range(0, n_epochs + 1)) * samples_shift
@@ -54,13 +53,13 @@ def epoch(data, samples_epoch, samples_overlap=0):
     epochs = np.zeros((samples_epoch, n_channels, n_epochs))
 
     for i in range(0, n_epochs):
-        epochs[:, :, i] = data[markers[i]:markers[i] + samples_epoch, :]
+        epochs[:, :, i] = data[markers[i] : markers[i] + samples_epoch, :]
 
     return epochs
 
 
 def compute_band_powers(eegdata, fs):
-    #return a vector with all the values (Alpha, Beta, Delta, Theta)
+    # return a vector with all the values (Alpha, Beta, Delta, Theta)
     """Extract the features (band powers) from the EEG.
 
     Args:
@@ -82,26 +81,25 @@ def compute_band_powers(eegdata, fs):
 
     NFFT = nextpow2(winSampleLength)
     Y = np.fft.fft(dataWinCenteredHam, n=NFFT, axis=0) / winSampleLength
-    PSD = 2 * np.abs(Y[0:int(NFFT / 2), :])
+    PSD = 2 * np.abs(Y[0 : int(NFFT / 2), :])
     f = fs / 2 * np.linspace(0, 1, int(NFFT / 2))
 
     # SPECTRAL FEATURES
     # Average of band powers
     # Delta <4
-    ind_delta, = np.where(f < 4)
+    (ind_delta,) = np.where(f < 4)
     meanDelta = np.mean(PSD[ind_delta, :], axis=0)
     # Theta 4-8
-    ind_theta, = np.where((f >= 4) & (f <= 8))
+    (ind_theta,) = np.where((f >= 4) & (f <= 8))
     meanTheta = np.mean(PSD[ind_theta, :], axis=0)
     # Alpha 8-12
-    ind_alpha, = np.where((f >= 8) & (f <= 12))
+    (ind_alpha,) = np.where((f >= 8) & (f <= 12))
     meanAlpha = np.mean(PSD[ind_alpha, :], axis=0)
     # Beta 12-30
-    ind_beta, = np.where((f >= 12) & (f < 30))
+    (ind_beta,) = np.where((f >= 12) & (f < 30))
     meanBeta = np.mean(PSD[ind_beta, :], axis=0)
 
-    feature_vector = np.concatenate((meanDelta, meanTheta, meanAlpha,
-                                     meanBeta), axis=0)
+    feature_vector = np.concatenate((meanDelta, meanTheta, meanAlpha, meanBeta), axis=0)
 
     feature_vector = np.log10(feature_vector)
 
@@ -109,7 +107,7 @@ def compute_band_powers(eegdata, fs):
 
 
 def nextpow2(i):
-    #Find the next power of 2 for number i
+    # Find the next power of 2 for number i
     n = 1
     while n < i:
         n *= 2
@@ -117,8 +115,8 @@ def nextpow2(i):
 
 
 def compute_feature_matrix(epochs, fs):
-    
-    #Call compute_feature_vector for each EEG epoch
+
+    # Call compute_feature_vector for each EEG epoch
     n_epochs = epochs.shape[2]
 
     for i_epoch in range(n_epochs):
@@ -141,12 +139,12 @@ def get_feature_names(ch_names):
     Returns:
         (list): feature names
     """
-    bands = ['delta', 'theta', 'alpha', 'beta']
+    bands = ["delta", "theta", "alpha", "beta"]
 
     feat_names = []
     for band in bands:
         for ch in range(len(ch_names)):
-            feat_names.append(band + '-' + ch_names[ch])
+            feat_names.append(band + "-" + ch_names[ch])
 
     return feat_names
 
@@ -161,13 +159,15 @@ def update_buffer(data_buffer, new_data, notch=False, filter_state=None):
 
     if notch:
         if filter_state is None:
-            filter_state = np.tile(lfilter_zi(NOTCH_B, NOTCH_A),
-                                   (data_buffer.shape[1], 1)).T
-        new_data, filter_state = lfilter(NOTCH_B, NOTCH_A, new_data, axis=0,
-                                         zi=filter_state)
+            filter_state = np.tile(
+                lfilter_zi(NOTCH_B, NOTCH_A), (data_buffer.shape[1], 1)
+            ).T
+        new_data, filter_state = lfilter(
+            NOTCH_B, NOTCH_A, new_data, axis=0, zi=filter_state
+        )
 
     new_buffer = np.concatenate((data_buffer, new_data), axis=0)
-    new_buffer = new_buffer[new_data.shape[0]:, :]
+    new_buffer = new_buffer[new_data.shape[0] :, :]
 
     return new_buffer, filter_state
 
@@ -177,9 +177,10 @@ def get_last_data(data_buffer, newest_samples):
     Obtains from "buffer_array" the "newest samples" (N rows from the
     bottom of the buffer)
     """
-    new_buffer = data_buffer[(data_buffer.shape[0] - newest_samples):, :]
+    new_buffer = data_buffer[(data_buffer.shape[0] - newest_samples) :, :]
 
     return new_buffer
+
 
 def compute_beta(eegdata, fs):
     """prova per concentrazione"""
@@ -193,38 +194,37 @@ def compute_beta(eegdata, fs):
 
     NFFT = nextpow2(winSampleLength)
     Y = np.fft.fft(dataWinCenteredHam, n=NFFT, axis=0) / winSampleLength
-    PSD = 2 * np.abs(Y[0:int(NFFT / 2), :])
+    PSD = 2 * np.abs(Y[0 : int(NFFT / 2), :])
     f = fs / 2 * np.linspace(0, 1, int(NFFT / 2))
 
     # SPECTRAL FEATURES
     # Average of band powers
     # Delta <4
-    #ind_delta, = np.where(f < 4)
-    #meanDelta = np.mean(PSD[ind_delta, :], axis=0)
+    # ind_delta, = np.where(f < 4)
+    # meanDelta = np.mean(PSD[ind_delta, :], axis=0)
     # Theta 4-8
-    #ind_theta, = np.where((f >= 4) & (f <= 8))
-    #meanTheta = np.mean(PSD[ind_theta, :], axis=0)
+    # ind_theta, = np.where((f >= 4) & (f <= 8))
+    # meanTheta = np.mean(PSD[ind_theta, :], axis=0)
     # Alpha 8-12
-    ind_alpha, = np.where((f >= 8) & (f <= 12))
+    (ind_alpha,) = np.where((f >= 8) & (f <= 12))
     meanAlpha = np.mean(PSD[ind_alpha, :], axis=0)
     # Beta 12-30
-    ind_beta, = np.where((f >= 12) & (f < 30))
-    meanBeta = np.mean(PSD[ind_beta, :], axis=0) #livello di concentrazione
+    (ind_beta,) = np.where((f >= 12) & (f < 30))
+    meanBeta = np.mean(PSD[ind_beta, :], axis=0)  # livello di concentrazione
 
     feature_vector = np.concatenate((meanBeta, meanAlpha), axis=0)
 
-    feature_vector = np.log10(feature_vector) #vettore di segnali beta e alpha
-    
-    if(meanBeta > 1):  
+    feature_vector = np.log10(feature_vector)  # vettore di segnali beta e alpha
+
+    if meanBeta > 0.5:
         print(meanBeta)
-        print("concentrato")
-        comando = "Avanti"
+        comando = "AVANTI"
     else:
         print(meanBeta)
-        print("non concentrato")
-        comando = "Fermo"
+        comando = "FERMO"
 
-    return comando #se concentrato va avanti (Avanti) altrimenti sta fermo (Fermo)
+    return comando  # se concentrato va avanti (Avanti) altrimenti sta fermo (Fermo)
+
 
 def compute_alpha(eegdata, fs):
     """prova per concentrazione"""
@@ -238,28 +238,28 @@ def compute_alpha(eegdata, fs):
 
     NFFT = nextpow2(winSampleLength)
     Y = np.fft.fft(dataWinCenteredHam, n=NFFT, axis=0) / winSampleLength
-    PSD = 2 * np.abs(Y[0:int(NFFT / 2), :])
+    PSD = 2 * np.abs(Y[0 : int(NFFT / 2), :])
     f = fs / 2 * np.linspace(0, 1, int(NFFT / 2))
 
     # SPECTRAL FEATURES
     # Average of band powers
     # Delta <4
-    #ind_delta, = np.where(f < 4)
-    #meanDelta = np.mean(PSD[ind_delta, :], axis=0)
+    # ind_delta, = np.where(f < 4)
+    # meanDelta = np.mean(PSD[ind_delta, :], axis=0)
     # Theta 4-8
-    #ind_theta, = np.where((f >= 4) & (f <= 8))
-    #meanTheta = np.mean(PSD[ind_theta, :], axis=0)
+    # ind_theta, = np.where((f >= 4) & (f <= 8))
+    # meanTheta = np.mean(PSD[ind_theta, :], axis=0)
     # Alpha 8-12
-    ind_alpha, = np.where((f >= 8) & (f <= 12))
+    (ind_alpha,) = np.where((f >= 8) & (f <= 12))
     meanAlpha = np.mean(PSD[ind_alpha, :], axis=0)
     # Beta 12-30
-    ind_beta, = np.where((f >= 12) & (f < 30))
+    (ind_beta,) = np.where((f >= 12) & (f < 30))
     meanBeta = np.mean(PSD[ind_beta, :], axis=0)
 
     feature_vector = np.concatenate((meanBeta, meanAlpha), axis=0)
 
     feature_vector = np.log10(feature_vector)
-    
+
     print(meanAlpha)
 
     return feature_vector

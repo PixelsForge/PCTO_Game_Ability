@@ -27,8 +27,10 @@ SHIFT_LENGTH = EPOCH_LENGTH - OVERLAP_LENGTH
 INDEX_CHANNEL = [0]
 
 # start the communication with the MUSE
-stream("00:55:da:b5:49:3e", ppg_enabled=True, acc_enabled=True, gyro_enabled=True)  # "00:55:da:b5:49:3e" = MAC ADDRESS MUSE
-streams_EEG = resolve_byprop("type", "EEG", timeout=2)  # it triggers the EEG signals, which are used to find concentration
+stream("00:55:da:b5:49:3e", ppg_enabled=True, acc_enabled=True, gyro_enabled=True)  
+# "00:55:da:b5:49:3e" = MAC ADDRESS MUSE
+streams_EEG = resolve_byprop("type", "EEG", timeout=2)  
+# it triggers the EEG signals, which are used to find concentration
 streams_Gyro = resolve_byprop("type", "Gyroscope", timeout=2)  # starts the gyroscope
 # print(streams_EEG)
 # second inlet for EEG
@@ -43,57 +45,56 @@ fs_EEG = int(info_EEG.nominal_srate())  # frequency EEG signals
 
 listaComandi = [None]
 
+
 def museDxSx():
     """ACQUIRE LATERAL DIRECTION WITH ACCELEROMETER"""
     # Obtain EEG data from the LSL stream
     gyro_data, timestamp = inlet_Gyro.pull_chunk(timeout=1, max_samples=int(SHIFT_LENGTH * fs_Gyro))
-    
-    Theta = (0.5 * (gyro_data[-1][2] + gyro_data[-2][2]) * 1 / fs_Gyro)  # speed in this instant, average of the last 2 values, per gyroscope
-    print(Theta)
-    print(listaComandi)
-    comando = None
-    if(len(listaComandi) == 1):
 
-        if(Theta > 0.5): #va a sinistra
-            comando = 'A'
-            ##print("Gyroscope: ", comando)
+    Theta = (0.5 * (gyro_data[-1][2] + gyro_data[-2][2]) * 1 / fs_Gyro)  # speed in this instant, average of the last 2 values, per gyroscope
+    # print(Theta)
+    # print(listaComandi)
+    comando = None
+    if len(listaComandi) == 1:
+
+        if Theta > 0.5:  # go left
+            comando = "A"
             listaComandi.append(comando)
-        elif(Theta < -0.5): #va a destra
-            comando = 'D'
-            ##print("Gyroscope: ", comando)
+
+        elif Theta < -0.5:  # go right
+            comando = "D"
             listaComandi.append(comando)
+
         else:
-            comando = 'W' #rimane dritto
-            #print("Gyroscope: ", comando)
+            comando = "W"  # go straight 
             listaComandi.append(comando)
-    
-    elif(Theta > 0.5 and listaComandi[-2] == 'W'):
-        comando = 'A'
-        #print("Gyroscope: ", comando)
-    elif(Theta < -0.5 and listaComandi[-2] == 'A'):
-        comando = 'W'
-        #print("Gyroscope: ", comando)
-    elif(Theta < -0.5 and listaComandi[-2] == 'W'):
-        comando = 'D'
-        #print("Gyroscope: ", comando)
-    elif(Theta > 0.5 and listaComandi[-2]== 'D'):
-        comando = 'W'
-        #print("Gyroscope: ", comando)
-        
-    elif(Theta > 0.5 and listaComandi[-2] == 'A'):
-        comando = 'A'
-        #print("Gyroscope: ", comando)
-    elif(Theta < -0.5 and listaComandi[-2] == 'D'):
-        comando = 'D'
-        #print("Gyroscope: ", comando)
-        
+
+    elif Theta > 0.5 and listaComandi[-2] == "W":
+        comando = "A"
+
+    elif Theta < -0.5 and listaComandi[-2] == "A":
+        comando = "W"
+
+    elif Theta < -0.5 and listaComandi[-2] == "W":
+        comando = "D"
+
+    elif Theta > 0.5 and listaComandi[-2] == "D":
+        comando = "W"
+
+    elif Theta > 0.5 and listaComandi[-2] == "A":
+        comando = "A"
+
+    elif Theta < -0.5 and listaComandi[-2] == "D":
+        comando = "D"
+
     if len(listaComandi) > 1:
         if comando == None:
             listaComandi.append(listaComandi[-1])
         else:
             listaComandi.append(comando)
-            
+
     return comando  # the command that will enter the alphabot
+
 
 def museConcentrazione():
     # returns the incoming command to the alphabot for concentration
@@ -109,30 +110,29 @@ def museConcentrazione():
 
     """COMPUTE BAND POWERS"""
     data_epoch = utils.get_last_data(eeg_buffer, EPOCH_LENGTH * fs_EEG)
-    band_powers = utils.compute_band_powers(data_epoch, fs_EEG)  # band_powers(raggi alpha, beta, theta, delta) cioè tutti gli EEG
-    #print(band_powers)
-    band_beta = utils.compute_beta(data_epoch, fs_EEG)  # compute_beta function for calculating beta rays (concentration)
+    band_powers = utils.compute_band_powers(data_epoch, fs_EEG)  
+    # band_powers(raggi alpha, beta, theta, delta) cioè tutti gli EEG
+    band_beta = utils.compute_beta(data_epoch, fs_EEG)  
+    # compute_beta function for calculating beta rays (concentration)
 
     """     
     a second method         
     print(EEG_data[-1]) #raggi beta
-    Beta = 0.5*(EEG_data[-1][2] + EEG_data[-2][2]) * 1/fs_EEG #speed in this instant
+    Beta = 0.5 * (EEG_data[-1][2] + EEG_data[-2][2]) * 1/fs_EEG #speed in this instant
     print(Beta)
     if(Beta > 2):
         print('concentrato')
     else:
         print('non concentrato')
     """
-    return band_beta  # command (Avanti / Fermo) for the alphabot, if concentrated Avanti then go ahead, otherwise Fermo, stand still
+    return band_beta  # command for the alphabot, if concentrated AVANTI then go ahead, otherwise FERMO, stand still
+
 
 def main():
 
     while True:
         Direzione = museDxSx()
         Movimento = museConcentrazione()
-        #print("concentrazione: ", Movimento)
-        #print("Movimento: ", Direzione)
-        #time.sleep(0.3)
         print("----------------------------------------------------------------")
 
 
