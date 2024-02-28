@@ -2,30 +2,17 @@
 # _*_ coding: utf-8 -*-
 # server tpc
 
-# copia del server sull'alphabot
+# Server copy on the alphabot
 
 import socket as sck
 import threading as thr
 import time
 import RPi.GPIO as GPIO
-import sqlite3  # libreria data base
+import sqlite3  # database library 
 
-TEMPO_PER_CURVARE_DI_90_GRADI = 0.5
+client_list = []
 
-lista_client = []
-
-# classe thread
-
-# funzione che si avvia alla creazione della classe
-def __init__(self, connessione, indirizzo, alphabot):
-    thr.Thread.__init__(self)  # costruttore super (java)
-    self.connessione = connessione
-    self.indirizzo = indirizzo
-    self.alphabot = alphabot  # per usare la classe del robot all'interno del thread
-    self.running = True
-
-
-class AlphaBot(object):  # classe dell'Alfabot
+class AlphaBot(object):  # Alphabot class
 
     def __init__(self, in1=13, in2=12, ena=6, in3=21, in4=20, enb=26):
         self.IN1 = in1
@@ -34,10 +21,10 @@ class AlphaBot(object):  # classe dell'Alfabot
         self.IN4 = in4
         self.ENA = ena
         self.ENB = enb
-        self.PA = 20  # velocità in girare
-        self.PB = 20  # velocità per girare
+        self.PA = 20  # turning speed
+        self.PB = 20  # turning speed  
 
-        # motori
+        # motors
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(self.IN1, GPIO.OUT)
@@ -52,7 +39,7 @@ class AlphaBot(object):  # classe dell'Alfabot
         self.PWMB.start(self.PB)
         self.stop()
 
-    def stop(self):  # fermare i motori
+    def stop(self):  # stop the motors
         self.PWMA.ChangeDutyCycle(0)
         self.PWMB.ChangeDutyCycle(0)
         GPIO.output(self.IN1, GPIO.LOW)
@@ -60,7 +47,7 @@ class AlphaBot(object):  # classe dell'Alfabot
         GPIO.output(self.IN3, GPIO.LOW)
         GPIO.output(self.IN4, GPIO.LOW)
 
-    def forward(self, speed=60):  # indietro velocità 60
+    def forward(self, speed=60):  # forward speed 60
         self.PWMA.ChangeDutyCycle(speed)
         self.PWMB.ChangeDutyCycle(speed)
         GPIO.output(self.IN1, GPIO.LOW)
@@ -68,7 +55,7 @@ class AlphaBot(object):  # classe dell'Alfabot
         GPIO.output(self.IN3, GPIO.HIGH)
         GPIO.output(self.IN4, GPIO.LOW)
 
-    def left(self, speed=25):  # girare a sinistra velocità settata in precedenza
+    def left(self, speed=25):  #turning left
         self.PWMA.ChangeDutyCycle(speed)
         self.PWMB.ChangeDutyCycle(speed)
         GPIO.output(self.IN1, GPIO.HIGH)
@@ -76,7 +63,7 @@ class AlphaBot(object):  # classe dell'Alfabot
         GPIO.output(self.IN3, GPIO.HIGH)
         GPIO.output(self.IN4, GPIO.LOW)  
 
-    def right(self, speed=25):  # destra con la velocità settata in precedenza
+    def right(self, speed=25):  # right speed 25
         self.PWMA.ChangeDutyCycle(speed)
         self.PWMB.ChangeDutyCycle(speed)
         GPIO.output(self.IN1, GPIO.LOW)
@@ -113,46 +100,39 @@ class AlphaBot(object):  # classe dell'Alfabot
 
 def main():
     s = sck.socket(sck.AF_INET, sck.SOCK_STREAM)
-    s.bind(("0.0.0.0", 3450))  # bind del server tcp
+    s.bind(("0.0.0.0", 3450))  # bind of tcp server 
     s.listen()
-    Ab = AlphaBot()  # inizzializzo alphabot
+    Ab = AlphaBot()  # initializing alphabot
 
     running = True
 
-    connessione, indirizzo = s.accept()  # connessioni dei client
+    connection, address = s.accept()  # client connection
 
-    # client = Classe_Thread(connessione, indirizzo, Ab)
-    # mettere codice run
-    while running:  # ciclo infinito del programma
-        messaggio = (connessione.recv(4096)).decode()  # ricevo il comando
 
-        if messaggio == "exit":  # per chiudere il programma e scollegare i client
+    while running:  # infinite loop
+        message = (connection.recv(4096)).decode()  # receive command
+
+        if message == "exit":  # for closing the program
             running = False
 
-            lista_client.remove()
+            client_list.remove()
 
         else:
-            print(messaggio)
+            print(message)
 
-            if messaggio.upper().startswith("W"):  # avanti
+            if message.upper().startswith("W"):  # forward
                 Ab.forward()
-                #time.sleep(1)
-                #Ab.stop()
 
-            if messaggio.upper().startswith("D"):  # destra
+            if message.upper().startswith("D"):  # right
                 Ab.right()
-                #time.sleep(1)
-                #Ab.stop()
 
-            if messaggio.upper().startswith("A"):  # sinistra
+            if message.upper().startswith("A"):  # left
                 Ab.left()
-                #time.sleep(1)
-                #Ab.stop()
 
-            if messaggio.upper().startswith("FERMO"):  # fermo
+            if message.upper().startswith("STOP"):  # stop
                 Ab.stop()
 
     s.close()
 
-
-main()
+if __name__ == "__main__":
+    main()

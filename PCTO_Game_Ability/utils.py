@@ -183,7 +183,7 @@ def get_last_data(data_buffer, newest_samples):
 
 
 def compute_beta(eegdata, fs):
-    """prova per concentrazione"""
+    """concentration test"""
     # 1. Compute the PSD
     winSampleLength, nbCh = eegdata.shape
 
@@ -210,24 +210,24 @@ def compute_beta(eegdata, fs):
     meanAlpha = np.mean(PSD[ind_alpha, :], axis=0)
     # Beta 12-30
     (ind_beta,) = np.where((f >= 12) & (f < 30))
-    meanBeta = np.mean(PSD[ind_beta, :], axis=0)  # livello di concentrazione
+    meanBeta = np.mean(PSD[ind_beta, :], axis=0)  # concentration level
 
     feature_vector = np.concatenate((meanBeta, meanAlpha), axis=0)
 
-    feature_vector = np.log10(feature_vector)  # vettore di segnali beta e alpha
+    feature_vector = np.log10(feature_vector)  # signal vector for alpha and beta
 
     if meanBeta > 0.3:
         print(meanBeta)
-        comando = "AVANTI"
+        command = "GO"
     else:
         print(meanBeta)
-        comando = "FERMO"
+        command = "STOP"
 
-    return comando  # se concentrato va avanti (Avanti) altrimenti sta fermo (Fermo)
+    return command  # if concentrated go straight(GO) otherwise stay still (STOP)
 
 
 def compute_alpha(eegdata, fs):
-    """prova per concentrazione"""
+    """concentration test"""
     # 1. Compute the PSD
     winSampleLength, nbCh = eegdata.shape
 

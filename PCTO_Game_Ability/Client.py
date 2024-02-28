@@ -6,7 +6,6 @@
 import logging
 import socket
 import threading as thr
-import time
 import Movement_Concentration
 
 registered = False
@@ -29,7 +28,7 @@ class Receiver(thr.Thread):
             
             if data == "OK":    #If it receives OK, the connection is successful
                 registered = True
-                logging.info(f"\nConnessione avvenuta, registrato. Entrando nella chat mode...")
+                logging.info(f"\nConnection established")
             
             else:
                 logging.info(f"\n{data}")
@@ -43,26 +42,26 @@ def main():
     ricev = Receiver(s) #receives messages, so that when the server sends the message back to clients, it reaches everyone
     ricev.start()
 
-    comando = None
+    command = None
     while True:
 
-        concentrazione = Movement_Concentration.museConcentrazione() #function that calculates the concentration level
+        concentration = Movement_Concentration.museConcentration() #function that calculates the concentration level
         
-        if(concentrazione == "AVANTI"): #concentrated subject
-            comando = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
-            if (comando != None):
-                print("comando concentrazione: ", comando)
-                s.sendall(comando.encode()) #send the message to the server
+        if(concentration == "GO"): #concentrated subject
+            command = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
+            if (command != None):
+                print("concentration command: ", command)
+                s.sendall(command.encode()) #send the message to the server
                 #time.sleep(0.5)       
         else:
-            comando = concentrazione #alphabot stopped (FERMO) cause unconcentrated subject
-            print("comando concentrazione: ", concentrazione)
-            s.sendall(comando.encode()) #send the message to the server
+            command = concentration #alphabot stopped (FERMO) cause unconcentrated subject
+            print("concentration command: ", concentration)
+            s.sendall(command.encode()) #send the message to the server
             #time.sleep(0.5)
 
-            if 'exit' in comando:   #In case the connection should be interrupted
+            if 'exit' in command:   #In case the connection should be interrupted
                 ricev.stop_run()    #breaks the connection
-                logging.info("Disconnessione...")
+                logging.info("Disconnetted...")
                 break
             
         

@@ -44,7 +44,7 @@ info_EEG = inlet_EEG.info()
 fs_Gyro = int(info_Gyro.nominal_srate())  # gyro frequency
 fs_EEG = int(info_EEG.nominal_srate())  # frequency EEG signals
 
-listaComandi = [None]
+command_list = [None]
 
 MIN_SX = 0.5
 MIN_DX = -0.5
@@ -56,55 +56,51 @@ def museDxSx():
 
     Theta = (0.5 * (gyro_data[-1][2] + gyro_data[-2][2]) * 1 / fs_Gyro)  # speed in this instant, average of the last 2 values, per gyroscope
     # print(Theta)
-    #print(listaComandi)
-    comando = None
-    if len(listaComandi) == 1:
+    #print(command_list)
+    command = None
+    if len(command_list) == 1:
 
         if Theta > MIN_SX:  # go left
-            comando = "A"
-            listaComandi.append(comando)
+            command = "A"
+            command_list.append(command)
 
         elif Theta < MIN_DX:  # go right
-            comando = "D"
-            listaComandi.append(comando)
+            command = "D"
+            command_list.append(command)
 
         else:
-            comando = "W"  # go straight 
-            listaComandi.append(comando)
+            command = "W"  # go straight 
+            command_list.append(command)
 
-    elif Theta > MIN_SX and listaComandi[-2] == "W" or Theta > MIN_SX and listaComandi[-2] == "A":
-        comando = "A"
+    elif Theta > MIN_SX and command_list[-2] == "W" or Theta > MIN_SX and command_list[-2] == "A":
+        command = "A"
 
-    elif Theta < MIN_DX and listaComandi[-2] == "A" or Theta > MIN_SX and listaComandi[-2] == "D":
-        comando = "W"
+    elif Theta < MIN_DX and command_list[-2] == "A" or Theta > MIN_SX and command_list[-2] == "D":
+        command = "W"
 
-    elif Theta < MIN_DX and listaComandi[-2] == "W" or Theta < MIN_SX and listaComandi[-2] == "D":
-        comando = "D"
+    elif Theta < MIN_DX and command_list[-2] == "W" or Theta < MIN_SX and command_list[-2] == "D":
+        command = "D"
 
 
-    if len(listaComandi) > 1:
-        if comando == None:
-            listaComandi.append(listaComandi[-1])
+    if len(command_list) > 1:
+        if command == None:
+            command_list.append(command_list[-1])
         else:
-            listaComandi.append(comando)
+            command_list.append(command)
 
-    if comando != None:
-        return comando  # the command that will enter the alphabot
+    if command != None:
+        return command  # the command that will enter the alphabot
     else:
-        return listaComandi[-1]
+        return command_list[-1]
 
 
-def museConcentrazione():
+def museConcentration():
     # returns the incoming command to the alphabot for concentration
     eeg_buffer = np.zeros((int(fs_EEG * BUFFER_LENGTH), 1))
     filter_state = None  # for use with the notch filter
-    EEG_data, timestamp = inlet_EEG.pull_chunk(
-        timeout=1, max_samples=int(SHIFT_LENGTH * fs_EEG)
-    )
+    EEG_data, timestamp = inlet_EEG.pull_chunk(timeout=1, max_samples=int(SHIFT_LENGTH * fs_EEG))
     ch_data = np.array(EEG_data)[:, INDEX_CHANNEL]
-    eeg_buffer, filter_state = utils.update_buffer(
-        eeg_buffer, ch_data, notch=True, filter_state=filter_state
-    )
+    eeg_buffer, filter_state = utils.update_buffer(eeg_buffer, ch_data, notch=True, filter_state=filter_state)
 
     """COMPUTE BAND POWERS"""
     data_epoch = utils.get_last_data(eeg_buffer, EPOCH_LENGTH * fs_EEG)
@@ -112,27 +108,28 @@ def museConcentrazione():
     # band_powers(raggi alpha, beta, theta, delta) cioè tutti gli EEG
     band_beta = utils.compute_beta(data_epoch, fs_EEG)  
     # compute_beta function for calculating beta rays (concentration)
+    
+    # command for the alphabot, if concentrated GO then go ahead, otherwise STOP, stand still
+    return band_beta  
 
 
-    return band_beta  # command for the alphabot, if concentrated AVANTI then go ahead, otherwise FERMO, stand still
-
-def simulationPressionKeys(comando, movimento):
+def simulationPressionKeys(command, movement):
     keyboard = Controller()
-    if(movimento == "FERMO"):
+    if(movement == "STOP"):
         keyboard.press(" ")
         keyboard.release("w")
         keyboard.release("a")
         keyboard.release("d")
-    elif(comando == "W" and movimento == "AVANTI"):
+    elif(command == "W" and movement == "GO"):
         keyboard.press("w")
         keyboard.release(" ")
         keyboard.release("a")
         keyboard.release("d")
-    elif(comando == "A"):
+    elif(command == "A"):
         keyboard.release("w")
         keyboard.release("d")
         keyboard.press("a")
-    elif(comando == "D"):
+    elif(command == "D"):
         keyboard.release("w")
         keyboard.release("a")
         keyboard.press("d")
@@ -141,7 +138,7 @@ def simulationPressionKeys(comando, movimento):
 def main():
     keyboard = Controller()
     while True:
-        simulationPressionKeys(museDxSx(), museConcentrazione())
+        simulationPressionKeys(museDxSx(), museConcentration())
 
 
 if __name__ == "__main__":
