@@ -7,6 +7,7 @@ import logging
 import socket
 import threading as thr
 import Movement_Concentration
+import subprocess # library to open a .exe file
 
 registered = False
 nickname = ""
@@ -36,6 +37,8 @@ class Receiver(thr.Thread):
 def main():
     global registered
     global nickname
+    file = "./Windows/Pcto.exe" # file to open
+    subprocess.Popen(file) # command to open the file
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #I create a TCP / IPv4 socket, first it sends, I create the base that does everything
     s.connect(SERVER)  #connection to the server
 

@@ -46,8 +46,8 @@ fs_EEG = int(info_EEG.nominal_srate())  # frequency EEG signals
 
 command_list = [None]
 
-MIN_SX = 0.5
-MIN_DX = -0.5
+MIN_SX = 0.3
+MIN_DX = -0.3
 
 def museDxSx():
     """ACQUIRE LATERAL DIRECTION WITH ACCELEROMETER"""
