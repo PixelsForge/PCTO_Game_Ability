@@ -46,8 +46,8 @@ fs_EEG = int(info_EEG.nominal_srate())  # frequency EEG signals
 
 command_list = [None]
 
-MIN_SX = 0.3
-MIN_DX = -0.3
+MIN_SX = 1
+MIN_DX = -1
 
 def museDxSx():
     """ACQUIRE LATERAL DIRECTION WITH ACCELEROMETER"""
@@ -56,7 +56,7 @@ def museDxSx():
 
     Theta = (0.5 * (gyro_data[-1][2] + gyro_data[-2][2]) * 1 / fs_Gyro)  # speed in this instant, average of the last 2 values, per gyroscope
     # print(Theta)
-    #print(command_list)
+    print(command_list)
     command = None
     if len(command_list) == 1:
 
@@ -72,13 +72,13 @@ def museDxSx():
             command = "W"  # go straight 
             command_list.append(command)
 
-    elif Theta > MIN_SX and command_list[-2] == "W" or Theta > MIN_SX and command_list[-2] == "A":
+    if Theta > MIN_SX and command_list[-2] == "W" or Theta > MIN_SX and command_list[-2] == "A":
         command = "A"
 
     elif Theta < MIN_DX and command_list[-2] == "A" or Theta > MIN_SX and command_list[-2] == "D":
         command = "W"
 
-    elif Theta < MIN_DX and command_list[-2] == "W" or Theta < MIN_SX and command_list[-2] == "D":
+    elif Theta < MIN_DX and command_list[-2] == "W" or Theta < MIN_DX and command_list[-2] == "D":
         command = "D"
 
 
@@ -138,8 +138,8 @@ def simulationPressionKeys(command, movement):
 def main():
     keyboard = Controller()
     while True:
-        simulationPressionKeys(museDxSx(), museConcentration())
-
-
+        #simulationPressionKeys(museDxSx(), museConcentration())
+        museDxSx()
+        museConcentration()
 if __name__ == "__main__":
     main()
