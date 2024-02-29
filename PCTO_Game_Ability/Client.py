@@ -49,7 +49,7 @@ def main():
     while True:
 
         concentration = Movement_Concentration.museConcentration() #function that calculates the concentration level
-        
+        Movement_Concentration.simulationPressionKeys(Movement_Concentration.museDxSx(), Movement_Concentration.museConcentration()) 
         if(concentration == "GO"): #concentrated subject
             command = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
             if (command != None):
