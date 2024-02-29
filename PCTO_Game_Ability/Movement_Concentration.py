@@ -56,7 +56,7 @@ def museDxSx():
 
     Theta = (0.5 * (gyro_data[-1][2] + gyro_data[-2][2]) * 1 / fs_Gyro)  # speed in this instant, average of the last 2 values, per gyroscope
     # print(Theta)
-    print(command_list)
+    #print(command_list)
     command = None
     if len(command_list) == 1:
 
@@ -138,8 +138,6 @@ def simulationPressionKeys(command, movement):
 def main():
     keyboard = Controller()
     while True:
-        #simulationPressionKeys(museDxSx(), museConcentration())
-        museDxSx()
-        museConcentration()
+        simulationPressionKeys(museDxSx(), museConcentration())
 if __name__ == "__main__":
     main()
