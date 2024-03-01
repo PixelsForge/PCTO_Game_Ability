@@ -7,11 +7,11 @@ import logging
 import socket
 import threading as thr
 import Movement_Concentration
-import subprocess # library to open a .exe file
+# import subprocess      library to open a .exe file
 
 registered = False
 nickname = ""
-SERVER=('192.168.168.111', 3450) # IP address alphabot
+SERVER=('192.168.1.119', 3450) # IP address alphabot
 class Receiver(thr.Thread):
     def __init__(self, s): #Thread constructor, self is like this, s is the socket
         thr.Thread.__init__(self)  #constructor 
@@ -37,8 +37,8 @@ class Receiver(thr.Thread):
 def main():
     global registered
     global nickname
-    file = "./Windows/Pcto.exe" # file to open
-    subprocess.Popen(file) # command to open the file
+    #file = "./Windows/Pcto.exe" # file to open
+    #subprocess.Popen(file) # command to open the file
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #I create a TCP / IPv4 socket, first it sends, I create the base that does everything
     s.connect(SERVER)  #connection to the server
 
@@ -49,18 +49,17 @@ def main():
     while True:
 
         concentration = Movement_Concentration.museConcentration() #function that calculates the concentration level
-        Movement_Concentration.simulationPressionKeys(Movement_Concentration.museDxSx(), Movement_Concentration.museConcentration()) 
+        #Movement_Concentration.simulationPressionKeys(Movement_Concentration.museDxSx(), Movement_Concentration.museConcentration()) 
         if(concentration == "GO"): #concentrated subject
             command = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
             if (command != None):
                 print("concentration command: ", command)
                 s.sendall(command.encode()) #send the message to the server
-                #time.sleep(0.5)       
+      
         else:
             command = concentration #alphabot stopped (FERMO) cause unconcentrated subject
             print("concentration command: ", concentration)
             s.sendall(command.encode()) #send the message to the server
-            #time.sleep(0.5)
 
             if 'exit' in command:   #In case the connection should be interrupted
                 ricev.stop_run()    #breaks the connection

@@ -136,7 +136,7 @@ def simulationPressionKeys(command, movement):
 
 
 def main():
-    keyboard = Controller()
+    #keyboard = Controller()
     while True:
         #simulationPressionKeys(museDxSx(), museConcentration())
         museDxSx()
