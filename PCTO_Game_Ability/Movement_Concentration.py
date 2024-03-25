@@ -72,13 +72,13 @@ def museDxSx():
             command = "W"  # go straight 
             command_list.append(command)
 
-    if Theta > MIN_SX and command_list[-2] == "W" or Theta > MIN_SX and command_list[-2] == "A":
+    if Theta > MIN_SX and command_list[-1] == "W" or Theta > MIN_SX and command_list[-1] == "A":
         command = "A"
 
-    elif Theta < MIN_DX and command_list[-2] == "A" or Theta > MIN_SX and command_list[-2] == "D":
+    elif Theta < MIN_DX and command_list[-1] == "A" or Theta > MIN_SX and command_list[-1] == "D":
         command = "W"
 
-    elif Theta < MIN_DX and command_list[-2] == "W" or Theta < MIN_DX and command_list[-2] == "D":
+    elif Theta < MIN_DX and command_list[-1] == "W" or Theta < MIN_DX and command_list[-1] == "D":
         command = "D"
 
 
@@ -128,10 +128,12 @@ def simulationPressionKeys(command, movement):
     elif(command == "A"):
         keyboard.release("w")
         keyboard.release("d")
+        keyboard.release(" ")
         keyboard.press("a")
     elif(command == "D"):
         keyboard.release("w")
         keyboard.release("a")
+        keyboard.release(" ")
         keyboard.press("d")
 
 

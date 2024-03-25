@@ -102,8 +102,7 @@ def update_buffer(data_buffer, new_data, notch=False, filter_state=None):
 
 def get_last_data(data_buffer, newest_samples):
     """
-    Obtains from "buffer_array" the "newest samples" (N rows from the
-    bottom of the buffer)
+    Obtains from "buffer_array" the "newest samples" (N rows from the bottom of the buffer)
     """
     new_buffer = data_buffer[(data_buffer.shape[0] - newest_samples) :, :]
 
@@ -152,3 +151,4 @@ def compute_beta(eegdata, fs):
         command = "STOP"
 
     return command  # if concentrated go straight(GO) otherwise stay still (STOP)
+ 

@@ -52,9 +52,8 @@ def main():
         #Movement_Concentration.simulationPressionKeys(Movement_Concentration.museDxSx(), Movement_Concentration.museConcentration()) 
         if(concentration == "GO"): #concentrated subject
             command = Movement_Concentration.museDxSx() #control of where and if the subject turns his head
-            if (command != None):
-                print("concentration command: ", command)
-                s.sendall(command.encode()) #send the message to the server
+            print("concentration command: ", command)
+            s.sendall(command.encode()) #send the message to the server
       
         else:
             command = concentration #alphabot stopped (FERMO) cause unconcentrated subject
