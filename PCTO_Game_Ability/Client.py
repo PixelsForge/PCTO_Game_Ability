@@ -7,7 +7,7 @@ import logging
 import socket
 import threading as thr
 import Movement_Concentration
-# import subprocess      library to open a .exe file
+# import subprocess library to open a .exe file
 
 registered = False
 nickname = ""
@@ -62,10 +62,7 @@ def main():
 
             if 'exit' in command:   #In case the connection should be interrupted
                 ricev.stop_run()    #breaks the connection
-                logging.info("Disconnetted...")
-                break
-            
-        
+                 
     ricev.join()
     s.close()
 
